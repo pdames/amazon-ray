@@ -242,6 +242,28 @@ def test_cloudwatch_alarm_creation(cloudwatch_client_stub):
     cloudwatch_client_stub.assert_no_pending_responses()
 
 
+def test_custom_network_interfaces(ec2_client_stub):
+    from ray.autoscaler._private.providers import _NODE_PROVIDERS
+
+    # given our mocks and an example config file as input...
+    # expect the config to be loaded, validated, and bootstrapped successfully
+    config = helpers.bootstrap_aws_example_config_file(
+        "example-network-interfaces.yaml")
+
+    head_node_cfg = config["head_node"]
+    worker_node_cfg = config["worker_nodes"]
+
+    importer = _NODE_PROVIDERS.get(config["provider"]["type"])
+    if not importer:
+        raise NotImplementedError("Unsupported provider {}".format(
+            config["provider"]))
+
+    provider_cls = importer(config["provider"])
+    provider_cls.create_node(head_node_cfg, {}, 1)
+    provider_cls.create_node(worker_node_cfg, {}, 1)
+
+
+
 if __name__ == "__main__":
     import sys
 

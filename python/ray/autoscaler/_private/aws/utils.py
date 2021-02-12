@@ -130,11 +130,13 @@ def boto_exception_handler(msg, *args, **kwargs):
 
 @lru_cache()
 def resource_cache(name, region, **kwargs):
-    boto_config = Config(retries={"max_attempts": BOTO_MAX_RETRIES})
+    kwargs.setdefault(
+        "config",
+        Config(retries={"max_attempts": BOTO_MAX_RETRIES}),
+    )
     return boto3.resource(
         name,
         region,
-        config=boto_config,
         **kwargs,
     )
 
@@ -146,10 +148,12 @@ def client_cache(name, region, **kwargs):
         return resource_cache(name, region, **kwargs).meta.client
     except ResourceNotExistsError:
         # fall back for clients without an associated resource
-        boto_config = Config(retries={"max_attempts": BOTO_MAX_RETRIES})
+        kwargs.setdefault(
+            "config",
+            Config(retries={"max_attempts": BOTO_MAX_RETRIES}),
+        )
         return boto3.client(
             name,
             region,
-            config=boto_config,
             **kwargs,
         )
