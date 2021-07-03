@@ -234,7 +234,7 @@ hyperopt==0.2.5
     # via -r requirements_tune.in
 idna==2.10
     # via requests
-importlib-metadata==3.4.0
+importlib-metadata==4.6.0
     # via
     #   cmd2
     #   jsonschema
